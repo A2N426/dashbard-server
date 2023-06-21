@@ -4,7 +4,7 @@ require("dotenv").config();
 const app = express();
 const morgan = require('morgan')
 const port = process.env.PORT || 5000;
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 
 // middleware
 const corsOptions = {
@@ -65,6 +65,26 @@ async function run() {
             const admin = { admin: user?.role === "admin" };
             const instructor = { instructor: user?.role === "instructor" };
             res.send({ admin, instructor })
+        })
+
+        // get all users
+        app.get("/users",async(req,res)=>{
+            const result = await usersCollection.find().toArray()
+            res.send(result);
+
+        })
+
+         // user role handle
+         app.put("/usersRole/:id", async (req, res) => {
+            const id = req.params.id;
+            const role = req.body;
+            const query = { _id: new ObjectId(id) };
+            const options = { upsert: true };
+            const updatedDoc = {
+                $set: { role: role.role }
+            }
+            const result = await usersCollection.updateOne(query, updatedDoc, options);
+            res.send(result)
         })
 
 
