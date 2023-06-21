@@ -55,6 +55,18 @@ async function run() {
             res.send(result)
         })
 
+        // get user by users role
+        app.get("/users/admin/:email", async (req, res) => {
+            const email = req.params.email;
+
+            const query = { email: email };
+            console.log("from server",email)
+            const user = await usersCollection.findOne(query);
+            const admin = { admin: user?.role === "admin" };
+            const instructor = { instructor: user?.role === "instructor" };
+            res.send({ admin, instructor })
+        })
+
 
         // Send a ping to confirm a successful connection
         await client.db("admin").command({ ping: 1 });
